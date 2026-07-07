@@ -1,0 +1,72 @@
+import cv2
+import numpy as np
+
+image_path = '/Users/samayjain/PycharmProjects/OpenAIVers/.venv/Screenshot 2026-07-07 12-00-13.jpg'
+frame = cv2.imread(image_path)
+
+if frame is None:
+    exit()
+
+all_circles = np.empty((0, 3), int)
+
+gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+blurred = cv2.GaussianBlur(gray, (9, 9), 2)
+
+circle = cv2.HoughCircles(
+    blurred,
+    cv2.HOUGH_GRADIENT,
+    dp=1.2,
+    minDist=50,
+    param1=45,
+    param2=15,
+    minRadius=10,
+    maxRadius=150
+)
+
+intensities = []
+
+if circle is not None:
+    circles = (np.round(circle[0, :]).astype("int"))
+    all_circles = np.append(all_circles, circles, axis=0)
+
+    xs = []
+    ys = []
+
+    for (x, y, r) in all_circles:
+        cv2.circle(frame, (x, y), r, (0, 255, 0), 4)
+        xs.append(x)
+        ys.append(y)
+
+    max_x = int(max(xs) + r)
+    min_x = int(min(xs) - r)
+    max_y = int(max(ys) + r)
+    min_y = int(min(ys) - r)
+
+    height_full, width_full = frame.shape[:2]
+    min_x = max(0, min_x)
+    min_y = max(0, min_y)
+    max_x = min(width_full, max_x)
+    max_y = min(height_full, max_y)
+
+    cv2.rectangle(frame, (max_x, max_y), (min_x, min_y), (0, 255, 0), 2)
+
+    gray_roi = gray[min_y:max_y, min_x:max_x]
+    height, width = gray_roi.shape
+
+    for (x, y, radius) in all_circles:
+        x_rel = x - min_x
+        y_rel = y - min_y
+
+        for p in range(max(0, x_rel - radius), min(width, x_rel + radius)):
+            for q in range(max(0, y_rel - radius), min(height, y_rel + radius)):
+                if ((p - x_rel) ** 2 + (q - y_rel) ** 2) < radius ** 2:
+                    val = gray_roi[q, p]
+                    intensities.append(val)
+
+if len(intensities) > 0:
+    avg_val = np.mean(intensities)
+    print(f"{avg_val:.0f}")
+
+cv2.imshow("Detected Circle & ROI", frame)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
