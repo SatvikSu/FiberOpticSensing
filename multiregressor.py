@@ -11,11 +11,11 @@ start_time = time.time()
 
 train_top_path = "/Users/samayjain/PycharmProjects/OpenAIVers/train_top_UNIQUE.csv"
 train_side_path = "/Users/samayjain/PycharmProjects/OpenAIVers/train_side_UNIQUE.csv"
-train_intensity_path = "/Users/samayjain/PycharmProjects/OpenAIVers/train_intensity_UNIQUE.csv"
+train_intensity_path = "/Users/samayjain/PycharmProjects/OpenAIVers/train_intensity_averages.csv"
 
 test_top_path = "/Users/samayjain/PycharmProjects/OpenAIVers/test_top_UNIQUE.csv"
 test_side_path = "/Users/samayjain/PycharmProjects/OpenAIVers/test_side_UNIQUE.csv"
-test_intensity_path = "/Users/samayjain/PycharmProjects/OpenAIVers/test_intensity_UNIQUE.csv"
+test_intensity_path = "/Users/samayjain/PycharmProjects/OpenAIVers/test_intensity_averages.csv"
 
 df_train_top = pd.read_csv(train_top_path)
 df_train_side = pd.read_csv(train_side_path)
@@ -28,9 +28,9 @@ df_test_intensity = pd.read_csv(test_intensity_path)
 assert len(df_train_top) == len(df_train_side) == len(df_train_intensity), "Training files have mismatched lengths!"
 assert len(df_test_top) == len(df_test_side) == len(df_test_intensity), "Testing files have mismatched lengths!"
 
-train_side = df_train_side.values[0::2, :]
-train_top = df_train_top.values[0::2, :]
-train_intensity = df_train_intensity.values[0::2, :]
+train_side = df_train_side.values[0::1, :]
+train_top = df_train_top.values[0::1, :]
+train_intensity = df_train_intensity.values[0::1, :]
 
 actual_train_side = train_side[:, 1:41]
 actual_train_top = train_top[:, 1:41]
